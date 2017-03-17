@@ -1,0 +1,61 @@
+{
+  "apps" : [{
+    "name": "Product Name",
+    "script": "server.js",
+    "env_production": {
+      "NODE_ENV": "production"
+    },
+    "env_staging": {
+      "NODE_ENV": "staging"
+    }
+  }],
+  "deploy" : {
+
+    "framework-staging" : {
+      "user": "node",
+      "host": "xxx.xxx.xxx.xx",
+      "repo": "git@github.com:engagementgamelab/el-web-sdk.git",
+      "ref": "origin/master",
+      "path": "/srv/framework",
+      "pre-deploy-local" : "echo 'Cloning and running npm install. Be patient.';",
+      "post-deploy" : "npm i ; grunt compile --sites=pokemon --env staging ; pm2 restart 0 -- pokemon --env staging",
+      "env": {
+        "NODE_ENV": "staging"
+      }
+    },
+
+    "staging" : {
+      "user": "node",
+      "host": "xxx.xxx.xxx.xx",
+      "repo": "git@github.com:engagementgamelab/pokemon.git",
+      "ref": "origin/master",
+      "path": "/srv/pokemon",
+      "pre-deploy-local" : "echo 'NPM linking pokemon and restarting app.'; git pull git@github.com:engagementgamelab/pokemon.git master;",
+      "post-deploy" : "npm i ; cd /srv/framework/current/ ; npm i ; grunt compile --sites=pokemon --env staging ; pm2 restart 0 -- pokemon --env staging"
+    },
+
+    "framework-production" : {
+      "user": "node",
+      "host": "xxx.xxx.xxx.xx",
+      "repo": "git@github.com:engagementgamelab/el-web-sdk.git",
+      "ref": "origin/master",
+      "path": "/srv/framework",
+      "pre-deploy-local" : "echo 'Cloning and running npm install. Be patient.'",
+      "post-deploy" : "npm install ; grunt compile --sites=pokemon --env production ; pm2 restart 0 -- pokemon --env production",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
+
+    "production" : {
+      "user": "node",
+      "host": "xxx.xxx.xxx.xx",
+      "repo": "git@github.com:engagementgamelab/pokemon.git",
+      "ref": "origin/production",
+      "path": "/srv/pokemon",
+      "pre-deploy-local" : "echo 'NPM linking pokemon and restarting app.';",
+      "post-deploy" : "npm i ; cd /srv/framework/current/ ; grunt compile --sites=pokemon --env production ; NODE_ENV=production pm2 restart server.js -- pokemon --env production"
+    }
+
+  }
+}
